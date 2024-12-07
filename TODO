@@ -1,0 +1,12 @@
+
+Stages:
+  Stage 0 - Basic repo setup:
+    ☐ Runs locally
+    ☐ Ruff
+    ☐ Pre-commit hooks
+    ☐ GitHub Actions for linting, type checking, and testing
+  Stage 1 - User can add and view an RSS feed:
+  Stage 2 - A news entry can be summarized and translated:
+  Stage 3 - User can configure their daily brief and view it in the app:
+  Stage 4 - User can receive their daily brief via email:
+
