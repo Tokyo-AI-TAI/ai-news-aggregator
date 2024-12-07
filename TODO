@@ -7,8 +7,11 @@ Stages:
     ✔ Configure pre-commit hooks @done(24-12-07 11:39)
     ✔ Configure GitHub Actions for linting, type checking, and testing @done(24-12-07 14:17)
   Stage 1 - User can add and view an RSS feed:
-    ☐ Create a model for an RSS feed, fill with dummy news data for testing
-    ☐ Visualize the RSS feed data in the dashboard
+    ✔ Create a model for an RSS feed, fill with dummy news data for testing @done(24-12-07 15:32)
+    ✔ Visualize the RSS feed data in the dashboard @done(24-12-07 15:32)
+    ☐ Protect the dashboard with authentication
+    ☐ Let user add, edit and delete their feeds
+    ☐ Let user view a list of news, sorted by time, based on their feeds
   Stage 2 - A news entry can be summarized and translated:
   Stage 3 - User can configure their daily brief and view it in the app:
   Stage 4 - User can receive their daily brief via email:

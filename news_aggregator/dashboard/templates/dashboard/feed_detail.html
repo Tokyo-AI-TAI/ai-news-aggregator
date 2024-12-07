@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}
+  {{ feed.title }}
+{% endblock title %}
+{% block content %}
+  <div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="{% url 'dashboard:feed_list' %}">Feeds</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">{{ feed.title }}</li>
+      </ol>
+    </nav>
+    <div class="row">
+      <div class="col-md-8">
+        <h1 class="mb-3">{{ feed.title }}</h1>
+        <p class="text-muted">{{ feed.description }}</p>
+        <div class="card shadow-sm">
+          <div class="list-group list-group-flush">
+            {% for entry in feed.entries.all %}
+              <div class="list-group-item">
+                <div class="d-flex w-100 justify-content-between align-items-center mb-2">
+                  <h5 class="mb-0">
+                    <a href="{{ entry.url }}" target="_blank" class="text-decoration-none">{{ entry.title }}</a>
+                  </h5>
+                  <small class="text-muted">{{ entry.published_at|date:"M d, Y" }}</small>
+                </div>
+                {% if entry.author %}
+                  <p class="mb-2">
+                    <small class="text-muted">By {{ entry.author }}</small>
+                  </p>
+                {% endif %}
+                <p class="mb-2">{{ entry.content|truncatewords:50 }}</p>
+                {% if entry.summary %}
+                  <div class="card bg-light mb-2">
+                    <div class="card-body py-2">
+                      <h6 class="card-subtitle mb-2 text-muted">AI Summary</h6>
+                      <p class="card-text">{{ entry.summary }}</p>
+                    </div>
+                  </div>
+                {% endif %}
+                {% if entry.title_translated %}
+                  <div class="card bg-light">
+                    <div class="card-body py-2">
+                      <h6 class="card-subtitle mb-2 text-muted">Translation ({{ entry.translation_language }})</h6>
+                      <h6>{{ entry.title_translated }}</h6>
+                      {% if entry.content_translated %}<p class="card-text">{{ entry.content_translated|truncatewords:50 }}</p>{% endif %}
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+            {% empty %}
+              <div class="list-group-item">
+                <p class="text-muted mb-0">No entries available for this feed.</p>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">Feed Information</h5>
+            <ul class="list-unstyled mb-0">
+              <li class="mb-2">
+                <strong>URL:</strong>
+                <br />
+                <a href="{{ feed.url }}" target="_blank" class="text-break">{{ feed.url }}</a>
+              </li>
+              <li class="mb-2">
+                <strong>Last Updated:</strong>
+                <br />
+                {{ feed.last_updated|date:"M d, Y H:i" }}
+              </li>
+              <li>
+                <strong>Status:</strong>
+                <br />
+                {% if feed.is_active %}
+                  <span class="badge bg-success">Active</span>
+                {% else %}
+                  <span class="badge bg-danger">Inactive</span>
+                {% endif %}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

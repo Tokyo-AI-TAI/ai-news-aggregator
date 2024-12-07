@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}
+  RSS Feeds
+{% endblock title %}
+{% block content %}
+  <div class="container py-5">
+    <h1 class="mb-4">RSS Feeds</h1>
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+      {% for feed in feeds %}
+        <div class="col">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">{{ feed.title }}</h5>
+              <p class="card-text text-muted small">{{ feed.description }}</p>
+              <div class="list-group list-group-flush">
+                {% for entry in feed.entries.all|slice:":3" %}
+                  <a href="{{ entry.url }}"
+                     class="list-group-item list-group-item-action"
+                     target="_blank">
+                    <div class="d-flex w-100 justify-content-between">
+                      <h6 class="mb-1">{{ entry.title }}</h6>
+                      <small class="text-muted">{{ entry.published_at|date:"M d, Y" }}</small>
+                    </div>
+                    {% if entry.author %}<small class="text-muted">By {{ entry.author }}</small>{% endif %}
+                  </a>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="card-footer bg-transparent">
+              <a href="{% url 'dashboard:feed_detail' feed.id %}"
+                 class="btn btn-outline-primary btn-sm">View all entries</a>
+              <small class="text-muted float-end">Last updated: {{ feed.last_updated|date:"M d, Y H:i" }}</small>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="col">
+          <div class="alert alert-info">No feeds available yet. Add some RSS feeds to get started.</div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock content %}
