@@ -31,6 +31,18 @@ uv sync --all-extras
 
 This will create a virtual environment in `.venv` and install all the dependencies.
 
+Activate the virtual environment by running:
+
+```bash
+source .venv/bin/activate
+```
+
+Or run your python commands with `uv run`:
+
+```bash
+uv run python manage.py <command>
+```
+
 ### Postgres
 
 On macOS, you can install Postgres using Homebrew. We are using version 16:
