@@ -1,9 +1,11 @@
+from http import HTTPStatus
+
 from django.test import TestCase
 from django.urls import reverse
-from http import HTTPStatus
+
 
 class DashboardViewTests(TestCase):
     def test_test_view(self):
-        response = self.client.get(reverse('dashboard:test'))
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertEqual(response.content.decode(), "Dashboard app is working!") 
+        response = self.client.get(reverse("dashboard:test"))
+        assert response.status_code == HTTPStatus.OK
+        assert response.content.decode() == "Dashboard app is working!"

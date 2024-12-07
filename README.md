@@ -43,6 +43,20 @@ Or run your python commands with `uv run`:
 uv run python manage.py <command>
 ```
 
+### Pre-commit hooks
+
+Install the pre-commit hooks by running (with activated environment, or with `uv run`):
+
+```bash
+pre-commit install
+```
+
+Make sure they run and pass by running:
+
+```bash
+pre-commit run --all
+```
+
 ### Postgres
 
 On macOS, you can install Postgres using Homebrew. We are using version 16:
