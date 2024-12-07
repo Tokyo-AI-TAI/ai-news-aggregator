@@ -2,7 +2,7 @@
 Stages:
   Stage 0 - Basic repo setup:
     ✔ Setup instructions in README.md @done(24-12-07 11:04)
-    ☐ Create the main django app and verify local dev setup
+    ✔ Create the dashboard django app and verify local dev setup @done(24-12-07 11:26)
     ☐ Configure Ruff
     ☐ Configure pre-commit hooks
     ☐ Configure GitHub Actions for linting, type checking, and testing

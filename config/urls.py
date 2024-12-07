@@ -23,6 +23,7 @@ urlpatterns = [
     # ...
     # Media files
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
+    path("dashboard/", include("news_aggregator.dashboard.urls")),
 ]
 
 
