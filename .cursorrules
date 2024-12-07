@@ -1,0 +1,49 @@
+# Cursor Rules for news-aggregator Project
+
+## Project Structure
+
+- Django project follows a modular approach with separate apps for distinct functionality
+- `feed_service` handles core RSS feed functionality and models
+- `dashboard` handles user interface and views
+- Authentication is handled by Django's built-in auth system
+
+## Code Style & Patterns
+
+- Models use descriptive names and include helpful docstrings
+- Model fields include appropriate help_text for clarity
+- Use of related_name in ForeignKey fields for reverse lookups
+- Consistent ordering in model Meta classes
+- Descriptive **str** methods for all models
+- Ruff is used for linting and formatting
+- Follows Django best practices where appropriate
+
+## View Patterns
+
+- All dashboard views require authentication (@login_required)
+- POST-only actions use HttpResponseNotAllowed for safety
+- Views use get_object_or_404 for clean 404 handling
+- Prefetch_related used for optimizing queries with related data
+- Redirect after successful POST actions
+
+## Template Patterns
+
+- Templates extend base.html
+- Bootstrap classes used for styling
+- Consistent use of semantic HTML5 elements
+- Forms use POST method with CSRF protection
+- Empty states handled with {% empty %} blocks
+- Slice filter used for limiting related items (|slice:":3")
+
+## Data Access Rules
+
+- Users can only access their subscribed feeds
+- Feed subscriptions are soft-deleted (is_active=False)
+- Feeds themselves are user-agnostic
+- Feed entries are always tied to a feed
+
+## Performance Patterns
+
+- Use prefetch_related for optimizing queries
+- Limit related items in templates (slice:":3")
+- Soft deletes instead of hard deletes
+- Indexes on frequently queried fields
