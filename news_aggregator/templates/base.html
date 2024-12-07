@@ -62,13 +62,20 @@
             </button>
             <a class="navbar-brand" href="{% url 'home' %}">news-aggregator</a>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-              <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
+              <ul class="navbar-nav me-auto">
+                <li class="nav-item">
                   <a class="nav-link" href="{% url 'home' %}">Home <span class="visually-hidden">(current)</span></a>
                 </li>
+                {% if request.user.is_authenticated %}
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'dashboard:feed_list' %}">My Feeds</a>
+                  </li>
+                {% endif %}
                 <li class="nav-item">
                   <a class="nav-link" href="{% url 'about' %}">About</a>
                 </li>
+              </ul>
+              <ul class="navbar-nav ms-auto">
                 {% if request.user.is_authenticated %}
                   <li class="nav-item">
                     <a class="nav-link" href="{% url 'users:detail' request.user.pk %}">{% translate "My Profile" %}</a>

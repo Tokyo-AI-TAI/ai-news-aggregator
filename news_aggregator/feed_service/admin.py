@@ -2,13 +2,18 @@ from django.contrib import admin
 
 from .models import Feed
 from .models import FeedEntry
+from .models import UserFeedSubscription
 
 
 @admin.register(Feed)
 class FeedAdmin(admin.ModelAdmin):
-    list_display = ("title", "url", "last_updated", "is_active")
+    list_display = ("title", "url", "last_updated", "is_active", "subscriber_count")
     list_filter = ("is_active", "created_at")
     search_fields = ("title", "description")
+
+    @admin.display(description="Active Subscribers")
+    def subscriber_count(self, obj):
+        return obj.subscribers.filter(is_active=True).count()
 
 
 @admin.register(FeedEntry)
@@ -61,3 +66,23 @@ class FeedEntryAdmin(admin.ModelAdmin):
     @admin.display(boolean=True)
     def has_summary(self, obj):
         return bool(obj.summary)
+
+
+@admin.register(UserFeedSubscription)
+class UserFeedSubscriptionAdmin(admin.ModelAdmin):
+    list_display = ("user", "feed", "subscribed_at", "is_active")
+    list_filter = ("is_active", "subscribed_at", "feed")
+    search_fields = ("user__username", "user__email", "feed__title")
+    raw_id_fields = ("user", "feed")
+    date_hierarchy = "subscribed_at"
+    actions = ["activate_subscriptions", "deactivate_subscriptions"]
+
+    @admin.display(description="Activate selected subscriptions")
+    def activate_subscriptions(self, request, queryset):
+        updated = queryset.update(is_active=True)
+        self.message_user(request, f"Activated {updated} subscriptions.")
+
+    @admin.display(description="Deactivate selected subscriptions")
+    def deactivate_subscriptions(self, request, queryset):
+        updated = queryset.update(is_active=False)
+        self.message_user(request, f"Deactivated {updated} subscriptions.")

@@ -5,9 +5,11 @@
 {% endblock title %}
 {% block content %}
   <div class="container py-5">
-    <h1 class="mb-4">RSS Feeds</h1>
-    <div class="row row-cols-1 row-cols-md-2 g-4">
-      {% for feed in feeds %}
+    <h1 class="mb-4">My RSS Feeds</h1>
+    <!-- Subscribed Feeds -->
+    <h2 class="h4 mb-3">Subscribed Feeds</h2>
+    <div class="row row-cols-1 row-cols-md-2 g-4 mb-5">
+      {% for feed in subscribed_feeds %}
         <div class="col">
           <div class="card h-100 shadow-sm">
             <div class="card-body">
@@ -28,15 +30,47 @@
               </div>
             </div>
             <div class="card-footer bg-transparent">
-              <a href="{% url 'dashboard:feed_detail' feed.id %}"
-                 class="btn btn-outline-primary btn-sm">View all entries</a>
-              <small class="text-muted float-end">Last updated: {{ feed.last_updated|date:"M d, Y H:i" }}</small>
+              <div class="d-flex justify-content-between align-items-center">
+                <a href="{% url 'dashboard:feed_detail' feed.id %}"
+                   class="btn btn-outline-primary btn-sm">View all entries</a>
+                <form method="post"
+                      action="{% url 'dashboard:unsubscribe_feed' feed.id %}"
+                      class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-outline-danger btn-sm">Unsubscribe</button>
+                </form>
+              </div>
+              <small class="text-muted d-block mt-2">Last updated: {{ feed.last_updated|date:"M d, Y H:i" }}</small>
             </div>
           </div>
         </div>
       {% empty %}
         <div class="col">
-          <div class="alert alert-info">No feeds available yet. Add some RSS feeds to get started.</div>
+          <div class="alert alert-info">You haven't subscribed to any feeds yet. Check out the available feeds below.</div>
+        </div>
+      {% endfor %}
+    </div>
+    <!-- Available Feeds -->
+    <h2 class="h4 mb-3">Available Feeds</h2>
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+      {% for feed in available_feeds %}
+        <div class="col">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">{{ feed.title }}</h5>
+              <p class="card-text text-muted small">{{ feed.description }}</p>
+            </div>
+            <div class="card-footer bg-transparent">
+              <form method="post" action="{% url 'dashboard:subscribe_feed' feed.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary btn-sm">Subscribe</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="col">
+          <div class="alert alert-info">No additional feeds available.</div>
         </div>
       {% endfor %}
     </div>

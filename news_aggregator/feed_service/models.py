@@ -61,3 +61,19 @@ class FeedEntry(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class UserFeedSubscription(models.Model):
+    user = models.ForeignKey(
+        "users.User", on_delete=models.CASCADE, related_name="feed_subscriptions"
+    )
+    feed = models.ForeignKey(Feed, on_delete=models.CASCADE, related_name="subscribers")
+    subscribed_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ["user", "feed"]
+        ordering = ["-subscribed_at"]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.feed.title}"
