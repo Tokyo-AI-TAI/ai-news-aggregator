@@ -76,7 +76,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          uv pip install -e ".[dev]"
+          uv pip install --system -e ".[dev]"
 
       - name: Check DB Migrations
         run: python manage.py makemigrations --check
