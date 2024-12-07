@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Add RSS Feed
+{% endblock title %}
+{% block content %}
+  <div class="container py-4">
+    <h1 class="mb-4">Add RSS Feed</h1>
+    {% if messages %}
+      {% for message in messages %}<div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>{% endfor %}
+    {% endif %}
+    <div class="card">
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="url" class="form-label">Feed URL</label>
+            <input type="url"
+                   class="form-control {% if form.url.errors %}is-invalid{% endif %}"
+                   id="url"
+                   name="url"
+                   value="{{ form.url.value|default:'' }}"
+                   placeholder="https://example.com/feed.xml" />
+            <div class="form-text">Enter the direct URL of the RSS feed (must start with http:// or https://)</div>
+            {% if form.url.errors %}
+              <div class="invalid-feedback">
+                {% for error in form.url.errors %}{{ error }}{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+          <button type="submit" class="btn btn-primary">Preview Feed</button>
+        </form>
+      </div>
+    </div>
+    {% if preview_data %}
+      <div class="mt-4">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="h4 mb-0">Feed Preview</h2>
+          </div>
+          <div class="card-body">
+            <div class="mb-4">
+              <h3 class="h5">{{ preview_data.title }}</h3>
+              <p class="text-muted mb-2">{{ preview_data.description }}</p>
+              <div class="small text-muted">
+                <strong>Feed URL:</strong> {{ preview_data.url }}
+                <br />
+                <strong>Total Entries:</strong> {{ preview_data.entry_count }}
+                {% if preview_data.is_already_in_db %}<div class="badge bg-info">Already in database</div>{% endif %}
+              </div>
+            </div>
+            {% if preview_data.latest_entries %}
+              <h4 class="h5 mb-3">Recent Posts</h4>
+              <div class="list-group">
+                {% for entry in preview_data.latest_entries %}
+                  <div class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <div>
+                        <h5 class="h6 mb-1">
+                          <a href="{{ entry.url }}" target="_blank" rel="noopener noreferrer">{{ entry.title }}</a>
+                        </h5>
+                        {% if entry.author %}<small class="text-muted d-block">By {{ entry.author }}</small>{% endif %}
+                        {% if entry.summary %}<p class="mb-1 mt-2 small">{{ entry.summary }}</p>{% endif %}
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+              <form method="post" class="mt-4">
+                {% csrf_token %}
+                <input type="hidden" name="url" value="{{ preview_data.url }}" />
+                <input type="hidden" name="action" value="subscribe" />
+                <button type="submit" class="btn btn-success">
+                  {% if preview_data.is_already_in_db %}
+                    Subscribe to This Feed
+                  {% else %}
+                    Add and Subscribe to This Feed
+                  {% endif %}
+                </button>
+              </form>
+            {% else %}
+              <div class="alert alert-warning">No recent entries found in this feed.</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+{% endblock content %}

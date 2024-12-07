@@ -2,18 +2,24 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.auth.decorators import login_required
 from django.urls import include
 from django.urls import path
 from django.views import defaults as default_views
 from django.views.generic import TemplateView
 
 from news_aggregator.dashboard.views import home
+from news_aggregator.feed_service.views import add_feed
 
 urlpatterns = [
-    path("", home, name="home"),
+    # Root path shows nothing for now
+    path("", TemplateView.as_view(template_name="pages/blank.html"), name="root"),
+    # Protected routes
+    path("home/", login_required(home), name="home"),
+    path("add_feed/", login_required(add_feed), name="add_feed"),
     path(
         "about/",
-        TemplateView.as_view(template_name="pages/about.html"),
+        login_required(TemplateView.as_view(template_name="pages/about.html")),
         name="about",
     ),
     # Django Admin, use {% url 'admin:index' %}
@@ -21,11 +27,14 @@ urlpatterns = [
     # User management
     path("users/", include("news_aggregator.users.urls", namespace="users")),
     path("accounts/", include("allauth.urls")),
-    # Your stuff: custom urls includes go here
-    # ...
+    # Feed management - protected
+    path("feeds/", include("news_aggregator.dashboard.urls", namespace="dashboard")),
+    path(
+        "feeds/service/",
+        include("news_aggregator.feed_service.urls", namespace="feed_service"),
+    ),
     # Media files
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
-    path("dashboard/", include("news_aggregator.dashboard.urls")),
 ]
 
 

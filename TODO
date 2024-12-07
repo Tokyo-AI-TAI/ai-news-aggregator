@@ -12,7 +12,7 @@ Stages:
     ✔ Protect the dashboard with authentication @done(24-12-07 16:27)
     ✔ Let user subscribe or unsubscribe from feeds @done(24-12-07 16:27)
     ✔ Let user view a list of news, sorted by time, based on their feeds @done(24-12-07 16:56)
-    ☐ Let user add new feeds by feed URL
+    ✔ Let user add new feeds by feed URL @done(24-12-07 20:19)
   Stage 2 - A news entry can be summarized and translated:
   Stage 3 - User can configure their daily brief and view it in the app:
   Stage 4 - User can receive their daily brief via email:

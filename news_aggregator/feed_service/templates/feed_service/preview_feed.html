@@ -1,0 +1,121 @@
+<div class="card">
+  <div class="card-header">
+    <h5 class="card-title mb-0">Feed Preview</h5>
+  </div>
+  <div class="card-body">
+    <h3>{{ preview.title }}</h3>
+    <p class="text-muted small">{{ preview.url }}</p>
+    {% if preview.description %}<p class="mb-4">{{ preview.description }}</p>{% endif %}
+    <div class="mb-4">
+      <h5>Feed Information</h5>
+      <ul class="list-unstyled">
+        <li>
+          <strong>Total Entries:</strong> {{ preview.entry_count }}
+        </li>
+        {% if preview.is_already_in_db %}
+          <li>
+            <div class="alert alert-warning mt-2" role="alert">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>
+              <strong>Note:</strong> This feed is already in our database
+            </div>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+    <div class="mb-4">
+      <h5>Latest Entries</h5>
+      {% if preview.latest_entries %}
+        <div class="list-group">
+          {% for entry in preview.latest_entries %}
+            <div class="list-group-item">
+              <div class="d-flex w-100 justify-content-between">
+                <h6 class="mb-1">{{ entry.title }}</h6>
+                {% if entry.author %}<small class="text-muted">By {{ entry.author }}</small>{% endif %}
+              </div>
+              {% if entry.summary %}<p class="mb-1">{{ entry.summary }}</p>{% endif %}
+              <a href="{{ entry.url }}"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 class="small">
+                Read more <span class="visually-hidden">about {{ entry.title }}</span>
+                <i class="bi bi-box-arrow-up-right ms-1"></i>
+              </a>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="alert alert-info" role="alert">No preview entries available</div>
+      {% endif %}
+    </div>
+    <form method="post" id="confirm-form" class="text-end">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="confirm" />
+      <input type="hidden" name="url" value="{{ preview.url }}" />
+      <div id="error-container" class="mb-3 text-start d-none">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <span id="error-message"></span>
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="alert"
+                  aria-label="Close"></button>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-success" id="confirm-button">
+        {% if preview.is_already_in_db %}
+          Subscribe to Feed
+        {% else %}
+          Add & Subscribe to Feed
+        {% endif %}
+      </button>
+    </form>
+  </div>
+</div>
+<script>
+  document.getElementById('confirm-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const button = document.getElementById('confirm-button');
+    const errorContainer = document.getElementById('error-container');
+    const errorMessage = document.getElementById('error-message');
+
+    // Clear any existing error messages
+    errorContainer.classList.add('d-none');
+    errorMessage.textContent = '';
+
+    button.disabled = true;
+    button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+
+    try {
+      const response = await fetch(e.target.action, {
+        method: 'POST',
+        body: new FormData(e.target),
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      });
+
+      const data = await response.json();
+
+      if (data.status === 'success') {
+        button.className = 'btn btn-success';
+        button.innerHTML = '<i class="bi bi-check-lg"></i> Added Successfully';
+        // Redirect to dashboard after a short delay
+        setTimeout(() => {
+          window.location.href = '/dashboard/';
+        }, 1500);
+      } else {
+        throw new Error(data.message || 'Failed to add feed');
+      }
+    } catch (error) {
+      button.className = 'btn btn-danger';
+      button.innerHTML = 'Try Again';
+      button.disabled = false;
+      // Show error message
+      errorMessage.textContent = error.message || 'Failed to add feed. Please try again.';
+      errorContainer.classList.remove('d-none');
+      errorContainer.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  });
+</script>

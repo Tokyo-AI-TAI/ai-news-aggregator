@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Discovered RSS Feeds
+{% endblock title %}
+{% block content %}
+  <div class="container py-4">
+    <h1 class="mb-4">Discovered RSS Feeds</h1>
+    <p class="text-muted">Feeds found at: {{ source_url }}</p>
+    {% if not feeds %}
+      <div class="alert alert-info">
+        No RSS feeds were found at this URL.
+        <a href="{% url 'discover_feeds' %}" class="alert-link">Try another URL</a>
+      </div>
+    {% else %}
+      <div class="row row-cols-1 row-cols-md-2 g-4">
+        {% for feed in feeds %}
+          <div class="col">
+            <div class="card h-100">
+              <div class="card-body">
+                <h5 class="card-title">{{ feed.title }}</h5>
+                <p class="card-text text-muted small">{{ feed.url }}</p>
+                {% if feed.description %}<p class="card-text">{{ feed.description }}</p>{% endif %}
+              </div>
+              <div class="card-footer bg-transparent">
+                {% if feed.is_already_in_db %}
+                  <form method="post"
+                        action="{% url 'subscribe_to_feed' %}"
+                        class="subscribe-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="feed_id" value="{{ feed.feed_id }}" />
+                    <button type="submit" class="btn btn-outline-primary">Subscribe</button>
+                  </form>
+                {% else %}
+                  <form method="post"
+                        action="{% url 'subscribe_to_feed' %}"
+                        class="subscribe-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="feed_url" value="{{ feed.url }}" />
+                    <button type="submit" class="btn btn-primary">Add & Subscribe</button>
+                  </form>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="mt-4">
+        <a href="{% url 'discover_feeds' %}" class="btn btn-outline-secondary">Discover More Feeds</a>
+      </div>
+    {% endif %}
+  </div>
+  {% block extra_js %}
+    <script>
+      document.querySelectorAll('.subscribe-form').forEach(form => {
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const button = form.querySelector('button');
+          button.disabled = true;
+          button.innerHTML = 'Processing...';
+
+          try {
+            const response = await fetch(form.action, {
+              method: 'POST',
+              body: new FormData(form),
+              headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+              }
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+              button.className = 'btn btn-success';
+              button.innerHTML = 'Subscribed ✓';
+            } else {
+              throw new Error(data.message || 'Subscription failed');
+            }
+          } catch (error) {
+            button.className = 'btn btn-danger';
+            button.innerHTML = 'Error - Try Again';
+            button.disabled = false;
+            console.error('Subscription error:', error);
+          }
+        });
+      });
+    </script>
+  {% endblock extra_js %}
+{% endblock content %}

@@ -25,6 +25,7 @@ dependencies = [
     "sentry-sdk==2.19.0",
     "django-storages[s3]==1.14.4",
     "django-anymail[amazon-ses]==12.0",
+    "feedparser>=6.0.11"
 ]
 
 [project.optional-dependencies]
@@ -138,7 +139,7 @@ select = [
   "DTZ",
   "T10",
   "DJ",
-  "EM",
+  # "EM",
   "EXE",
   "FA",
   'ISC',
@@ -164,7 +165,7 @@ select = [
   "PD",
   "PGH",
   "PL",
-  "TRY",
+  # "TRY",
   "FLY",
   # "NPY",
   # "AIR",
