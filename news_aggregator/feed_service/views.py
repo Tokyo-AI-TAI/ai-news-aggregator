@@ -5,6 +5,7 @@ from xml.etree.ElementTree import ParseError
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
+from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
@@ -23,7 +24,7 @@ def add_feed(request):
     POST: Preview feed or subscribe to it
     """
     form = AddFeedForm(request.POST or None)
-    context = {"form": form}
+    context = {"form": form, "preview_data": None, "error": None}
 
     if request.method == "POST":
         action = request.POST.get("action")
@@ -36,9 +37,17 @@ def add_feed(request):
                 preview_data = FeedService.preview_feed(form.cleaned_data["url"])
                 context["preview_data"] = preview_data
             except (URLError, HTTPError) as e:
-                messages.error(request, f"Failed to fetch feed: {e}")
+                if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                    return JsonResponse(
+                        {"status": "error", "message": f"Failed to fetch feed: {e}"}
+                    )
+                context["error"] = f"Failed to fetch feed: {e}"
             except (ParseError, ValueError) as e:
-                messages.error(request, f"Invalid feed format: {e}")
+                if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                    return JsonResponse(
+                        {"status": "error", "message": f"Invalid feed format: {e}"}
+                    )
+                context["error"] = f"Invalid feed format: {e}"
 
     return render(request, "feed_service/add_feed.html", context)
 

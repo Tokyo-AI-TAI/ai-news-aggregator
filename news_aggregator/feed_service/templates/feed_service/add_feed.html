@@ -6,9 +6,6 @@
 {% block content %}
   <div class="container py-4">
     <h1 class="mb-4">Add RSS Feed</h1>
-    {% if messages %}
-      {% for message in messages %}<div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>{% endfor %}
-    {% endif %}
     <div class="card">
       <div class="card-body">
         <form method="post">
@@ -27,6 +24,16 @@
                 {% for error in form.url.errors %}{{ error }}{% endfor %}
               </div>
             {% endif %}
+          </div>
+          <div id="error-container"
+               class="mb-3 text-start {% if not error %}d-none{% endif %}">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              <span id="error-message">{{ error }}</span>
+              <button type="button"
+                      class="btn-close"
+                      data-bs-dismiss="alert"
+                      aria-label="Close"></button>
+            </div>
           </div>
           <button type="submit" class="btn btn-primary">Preview Feed</button>
         </form>
