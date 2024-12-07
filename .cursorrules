@@ -16,6 +16,7 @@
 - Descriptive **str** methods for all models
 - Ruff is used for linting and formatting
 - Follows Django best practices where appropriate
+- In templates, endblock should always have a name
 
 ## View Patterns
 

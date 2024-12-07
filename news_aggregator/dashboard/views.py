@@ -5,6 +5,7 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 
 from news_aggregator.feed_service.models import Feed
+from news_aggregator.feed_service.models import FeedEntry
 from news_aggregator.feed_service.models import UserFeedSubscription
 
 
@@ -80,3 +81,19 @@ def unsubscribe_feed(request, feed_id):
     subscription.is_active = False
     subscription.save()
     return redirect("dashboard:feed_list")
+
+
+@login_required
+def home(request):
+    """Display a consolidated list of news entries from all subscribed feeds."""
+    # Get all entries from active subscriptions, ordered by publication date
+    entries = (
+        FeedEntry.objects.filter(
+            feed__subscribers__user=request.user,
+            feed__subscribers__is_active=True,
+        )
+        .select_related("feed")
+        .order_by("-published_at")
+    )
+
+    return render(request, "pages/home.html", {"entries": entries})

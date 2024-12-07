@@ -1,1 +1,33 @@
 {% extends "base.html" %}
+
+{% block content %}
+  <div class="container py-4">
+    <h1 class="mb-4">Latest News</h1>
+    {% if entries %}
+      <div class="list-group">
+        {% for entry in entries %}
+          <a href="{{ entry.url }}"
+             target="_blank"
+             class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">{{ entry.title }}</h5>
+              <small class="text-muted">{{ entry.published_at|timesince }} ago</small>
+            </div>
+            {% if entry.summary %}
+              <p class="mb-1">{{ entry.summary }}</p>
+            {% else %}
+              <p class="mb-1">{{ entry.content|truncatewords:50 }}</p>
+            {% endif %}
+            <small class="text-muted">From: {{ entry.feed.title }}</small>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="alert alert-info">
+        <p class="mb-0">
+          No news entries yet. Try subscribing to some feeds in the <a href="{% url 'dashboard:feed_list' %}">Feeds</a> section.
+        </p>
+      </div>
+    {% endif %}
+  </div>
+{% endblock content %}
