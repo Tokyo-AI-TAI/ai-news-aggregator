@@ -1,10 +1,11 @@
 
 Stages:
   Stage 0 - Basic repo setup:
-    ☐ Runs locally
-    ☐ Ruff
-    ☐ Pre-commit hooks
-    ☐ GitHub Actions for linting, type checking, and testing
+    ✔ Setup instructions in README.md @done(24-12-07 11:04)
+    ☐ Create the main django app and verify local dev setup
+    ☐ Configure Ruff
+    ☐ Configure pre-commit hooks
+    ☐ Configure GitHub Actions for linting, type checking, and testing
   Stage 1 - User can add and view an RSS feed:
   Stage 2 - A news entry can be summarized and translated:
   Stage 3 - User can configure their daily brief and view it in the app:

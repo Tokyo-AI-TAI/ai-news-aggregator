@@ -13,6 +13,92 @@ License: MIT
 
 Moved to [settings](https://cookiecutter-django.readthedocs.io/en/latest/1-getting-started/settings.html).
 
+## Setup
+
+This project was created with cookiecutter-django. Visit the [cookiecutter-django documentation](https://cookiecutter-django.readthedocs.io/en/latest/index.html) for more information.
+
+### Python with uv
+
+Install `uv` by following the instructions [here](https://docs.astral.sh/uv/getting-started/installation/).
+
+We are currently using Python version 3.12. Install it via your favorite approach, e.g. homebrew, pyenv, or uv. Make sure uv recognizes and picks up that version. See more details [here](https://docs.astral.sh/uv/guides/install-python/).
+
+Then, you can set up your virtual environment by running:
+
+```bash
+uv sync --all-extras
+```
+
+This will create a virtual environment in `.venv` and install all the dependencies.
+
+### Postgres
+
+On macOS, you can install Postgres using Homebrew. We are using version 16:
+
+```bash
+brew install postgresql@16
+```
+
+Then, start the server:
+
+```bash
+brew services start postgresql@16
+```
+
+You might need to add the following to your `.zshrc` or `.bashrc`:
+
+```bash
+export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"
+```
+
+Generate a secure password for the `postgres` user:
+
+```bash
+openssl rand -hex 16
+```
+
+Create a superuser called `postgres`:
+
+```bash
+createuser -P -s postgres
+```
+
+Confirm that you can connect to the database:
+
+```bash
+psql postgres
+```
+
+(Ctrl-D to exit)
+
+Create the database:
+
+```bash
+createdb --username=postgres news_aggregator
+```
+
+Create a `.env` file:
+
+```bash
+cp .envs.example .env
+```
+
+Replace the password with the one you generated earlier.
+
+Finally, run the initial migrations:
+
+```bash
+uv run python manage.py migrate
+```
+
+Verify that you can run the development server:
+
+```bash
+uv run python manage.py runserver
+```
+
+And access the site via <http://localhost:8000/>.
+
 ## Basic Commands
 
 ### Setting Up Your Users
