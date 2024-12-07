@@ -5,8 +5,10 @@ Stages:
     ✔ Create the dashboard django app and verify local dev setup @done(24-12-07 11:26)
     ✔ Configure Ruff @done(24-12-07 11:39)
     ✔ Configure pre-commit hooks @done(24-12-07 11:39)
-    ☐ Configure GitHub Actions for linting, type checking, and testing
+    ✔ Configure GitHub Actions for linting, type checking, and testing @done(24-12-07 14:17)
   Stage 1 - User can add and view an RSS feed:
+    ☐ Create a model for an RSS feed, fill with dummy news data for testing
+    ☐ Visualize the RSS feed data in the dashboard
   Stage 2 - A news entry can be summarized and translated:
   Stage 3 - User can configure their daily brief and view it in the app:
   Stage 4 - User can receive their daily brief via email:
