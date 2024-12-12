@@ -263,7 +263,10 @@ LOGGING = {
             "formatter": "verbose",
         },
     },
-    "root": {"level": "INFO", "handlers": ["console"]},
+    "root": {"level": "DEBUG", "handlers": ["console"]},
+    "loggers": {
+        "feed_service": {"level": "DEBUG", "handlers": ["console"]},
+    },
 }
 
 REDIS_URL = env("REDIS_URL", default="redis://localhost:6379/0")

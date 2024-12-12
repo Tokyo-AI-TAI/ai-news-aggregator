@@ -14,7 +14,9 @@ Features:
     ✔ Let user view a list of news, sorted by time, based on their feeds @done(24-12-07 16:56)
     ✔ Let user add new feeds by feed URL @done(24-12-07 20:19)
   User can add sites that are not RSS feeds:
-    ☐ Let the user add non-RSS sites by entering a URL
+    ✔ Let the user add non-RSS sites by entering a URL @done(24-12-12 20:23)
+    ☐ Speed up the feed parsing process by reusing the preview data
+    ☐ Multiple feeds could contain same news (e.g. when creating feeds for sub-topics in a site), handle gracefully
   The system can update all feeds, creating new news entries:
     ☐ Enable triggering an update of all feeds via terminal
     ☐ Dashboard displays all news by day
