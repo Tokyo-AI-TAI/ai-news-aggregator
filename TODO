@@ -1,18 +1,24 @@
 
-Stages:
-  Stage 0 - Basic repo setup:
+Features:
+  Basic repo setup:
     ✔ Setup instructions in README.md @done(24-12-07 11:04)
     ✔ Create the dashboard django app and verify local dev setup @done(24-12-07 11:26)
     ✔ Configure Ruff @done(24-12-07 11:39)
     ✔ Configure pre-commit hooks @done(24-12-07 11:39)
     ✔ Configure GitHub Actions for linting, type checking, and testing @done(24-12-07 14:17)
-  Stage 1 - User can add and view an RSS feed:
+  User can add and view an RSS feed:
     ✔ Create a model for an RSS feed, fill with dummy news data for testing @done(24-12-07 15:32)
     ✔ Visualize the RSS feed data in the dashboard @done(24-12-07 15:32)
     ✔ Protect the dashboard with authentication @done(24-12-07 16:27)
     ✔ Let user subscribe or unsubscribe from feeds @done(24-12-07 16:27)
     ✔ Let user view a list of news, sorted by time, based on their feeds @done(24-12-07 16:56)
     ✔ Let user add new feeds by feed URL @done(24-12-07 20:19)
-  Stage 2 - A news entry can be summarized and translated:
-  Stage 3 - User can configure their daily brief and view it in the app:
-  Stage 4 - User can receive their daily brief via email:
+  User can add sites that are not RSS feeds:
+    ☐ Let the user add non-RSS sites by entering a URL
+  The system can update all feeds, creating new news entries:
+    ☐ Enable triggering an update of all feeds via terminal
+    ☐ Dashboard displays all news by day
+  The system can summarize and translate news entries:
+    ☐ Translate and summarize all new news entries during an update
+    ☐ Display the summarized news entries in the dashboard
+    ☐ Predict relevancy score for each news entry based on user preferences
