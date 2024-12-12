@@ -9,6 +9,18 @@ class Feed(models.Model):
     last_updated = models.DateTimeField(default=timezone.now)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    FEED_TYPE_RSS = "rss"
+    FEED_TYPE_WEBSITE = "website"
+    FEED_TYPE_CHOICES = [
+        (FEED_TYPE_RSS, "RSS Feed"),
+        (FEED_TYPE_WEBSITE, "Website"),
+    ]
+    feed_type = models.CharField(
+        max_length=10,
+        choices=FEED_TYPE_CHOICES,
+        default=FEED_TYPE_RSS,
+        help_text="Type of feed source",
+    )
 
     class Meta:
         ordering = ["-created_at"]
