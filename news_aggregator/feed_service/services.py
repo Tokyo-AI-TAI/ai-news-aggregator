@@ -398,7 +398,7 @@ class AIService:
 Article Title: {entry.title}
 Article Content: {entry.full_content}
 
-Please provide a summary of this content, translate to English if needed, and focus on aspects matching user interests.
+Please provide a very short summary (TLDR, no more than two sentences) of this content, translate to English if needed, and focus on aspects matching user interests.
 Do not narrate about the article contents or discuss its relevancy in the summary, just directly summarize the content.
 If the content is not relevant to the user, simply provide a general summary. Adapting to the user's interests is only secondary.
 """
