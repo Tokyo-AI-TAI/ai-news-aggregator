@@ -15,12 +15,12 @@ Features:
     ✔ Let user add new feeds by feed URL @done(24-12-07 20:19)
   User can add sites that are not RSS feeds:
     ✔ Let the user add non-RSS sites by entering a URL @done(24-12-12 20:23)
-    ☐ Speed up the feed parsing process by reusing the preview data
+    ✔ Speed up the feed parsing process by reusing the preview data @done(24-12-14 17:12)
   The system can update all feeds, creating new news entries:
     ✔ Enable triggering an update of all feeds via terminal @done(24-12-14 13:18)
-    ☐ Dashboard displays all news by day
+    ✔ Dashboard displays all news by day @done(24-12-14 17:12)
   The system can summarize and translate news entries:
-    ☐ Add a way to let the user configure their preferences via a custom prompt
+    ✔ Add a way to let the user configure their preferences via a custom prompt @done(24-12-14 17:12)
     ☐ Translate and summarize all new news entries during an update
     ☐ Display the summarized news entries in the dashboard
     ☐ Predict relevancy score for each news entry based on user preferences

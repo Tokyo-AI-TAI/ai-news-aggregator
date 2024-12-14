@@ -23,6 +23,7 @@ class Feed(models.Model):
     )
 
     class Meta:
+        app_label = "feed_service"
         ordering = ["-created_at"]
 
     def __str__(self):
@@ -53,22 +54,6 @@ class FeedEntry(models.Model):
         default="",
         help_text="AI-translated title",
     )
-    content_translated = models.TextField(
-        blank=True,
-        default="",
-        help_text="AI-translated content",
-    )
-    summary = models.TextField(
-        blank=True,
-        default="",
-        help_text="AI-generated summary of the content",
-    )
-    translation_language = models.CharField(
-        max_length=10,
-        blank=True,
-        default="",
-        help_text="Language code of the translation",
-    )
     last_processed = models.DateTimeField(
         null=True,
         blank=True,
@@ -97,3 +82,31 @@ class UserFeedSubscription(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.feed.title}"
+
+
+class UserArticleInteraction(models.Model):
+    """Stores AI-generated content and user-specific data for each article."""
+
+    user = models.ForeignKey(
+        "users.User", on_delete=models.CASCADE, related_name="article_interactions"
+    )
+    entry = models.ForeignKey(
+        FeedEntry, on_delete=models.CASCADE, related_name="user_interactions"
+    )
+    custom_summary = models.TextField(
+        blank=True,
+        default="",
+        help_text="AI-generated summary of the article customized for the user",
+    )
+    relevance_score = models.IntegerField(
+        default=0,
+        help_text="AI-generated relevance score for the user, from 0 to 100",
+    )
+    processed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ["user", "entry"]
+        ordering = ["-processed_at"]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.entry.title}"

@@ -1,15 +1,21 @@
 import logging
 from dataclasses import dataclass
+from typing import Optional
 from urllib.parse import urlparse
 
 import feedparser
+from django.conf import settings
 from django.utils import timezone
 from feedparser import FeedParserDict
 from newspaper import Article
+from openai import OpenAI
 from parsera import Parsera
+from pydantic import BaseModel
 
-from .models import Feed
-from .models import FeedEntry
+from news_aggregator.feed_service.models import FeedEntry
+from news_aggregator.feed_service.models import UserFeedSubscription
+from news_aggregator.feed_service.models import Feed
+from news_aggregator.feed_service.models import UserArticleInteraction
 
 logger = logging.getLogger(__name__)
 
@@ -363,3 +369,92 @@ class FeedService:
             entry.article_load_error = error_msg
             entry.save()
             return False, error_msg
+
+
+class ArticleAnalysis(BaseModel):
+    """Structured output format for article analysis."""
+
+    summary: str
+    relevance_score: int
+    error: Optional[str] = None
+
+
+class AIService:
+    def __init__(self):
+        self.client = OpenAI()
+
+    def process_article_for_user(
+        self, entry: FeedEntry, user: "User"
+    ) -> ArticleAnalysis:
+        """Summarize (and possibly translate) an article for a specific user, generating a custom summary and relevance score."""
+        try:
+            # Create system message with clear instructions
+            system_message = """You are a precise article summarizer that processes content
+            and provides summaries focused on user interests."""
+
+            # Create user message with article content
+            user_message = f"""Consider the user's interests: "{user.interests}"
+
+Article Title: {entry.title}
+Article Content: {entry.full_content}
+
+Please provide a summary of this content, translate to English if needed, and focus on aspects matching user interests.
+Do not narrate about the article contents or discuss its relevancy in the summary, just directly summarize the content.
+If the content is not relevant to the user, simply provide a general summary. Adapting to the user's interests is only secondary.
+"""
+
+            # Use the parse method with structured outputs
+            completion = self.client.beta.chat.completions.parse(
+                model="gpt-4o",
+                messages=[
+                    {"role": "system", "content": system_message},
+                    {"role": "user", "content": user_message},
+                ],
+                response_format=ArticleAnalysis,
+            )
+
+            # Get the parsed response
+            result = completion.choices[0].message.parsed
+
+            # Check for refusal
+            if completion.choices[0].message.refusal:
+                return ArticleAnalysis(
+                    summary="",
+                    relevance_score=0,
+                    error=f"AI refused to process: {completion.choices[0].message.refusal}",
+                )
+
+            return result
+
+        except Exception as e:
+            error_msg = f"Error processing article {entry.pk}: {str(e)}"
+            logger.error(error_msg)
+            return ArticleAnalysis(summary="", relevance_score=0, error=error_msg)
+
+    @classmethod
+    def process_entry_for_all_users(cls, entry: FeedEntry) -> None:
+        """Process a feed entry for all subscribed users."""
+        ai_service = cls()
+
+        # Get all active subscribers for this feed
+        subscriptions = UserFeedSubscription.objects.filter(
+            feed=entry.feed, is_active=True
+        ).select_related("user")
+
+        for subscription in subscriptions:
+            result = ai_service.process_article_for_user(entry, subscription.user)
+
+            if not result.error:
+                # Create or update the user's interaction with this article
+                UserArticleInteraction.objects.update_or_create(
+                    user=subscription.user,
+                    entry=entry,
+                    defaults={
+                        "custom_summary": result.summary,
+                        "relevance_score": result.relevance_score,
+                    },
+                )
+            else:
+                logger.error(
+                    f"Failed to process entry {entry.pk} for user {subscription.user.pk}: {result.error}"
+                )

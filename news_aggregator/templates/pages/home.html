@@ -11,12 +11,17 @@
              class="list-group-item list-group-item-action">
             <div class="d-flex w-100 justify-content-between">
               <h5 class="mb-1">{{ entry.title }}</h5>
-              <small class="text-muted">{{ entry.published_at|timesince }} ago</small>
+              <div>
+                {% if entry.user_interactions.first.relevance_score %}
+                  <span class="badge bg-primary">{{ entry.user_interactions.first.relevance_score }}% Relevant</span>
+                {% endif %}
+                <small class="text-muted ms-2">{{ entry.published_at|timesince }} ago</small>
+              </div>
             </div>
-            {% if entry.summary %}
-              <p class="mb-1">{{ entry.summary }}</p>
+            {% if entry.user_interactions.first.custom_summary %}
+              <p class="mb-1">{{ entry.user_interactions.first.custom_summary }}</p>
             {% else %}
-              <p class="mb-1">{{ entry.content|truncatewords:50 }}</p>
+              <p class="mb-1">{{ entry.full_content|truncatewords:50 }}</p>
             {% endif %}
             <small class="text-muted">From: {{ entry.feed.title }}</small>
           </a>

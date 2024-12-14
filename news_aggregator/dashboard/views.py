@@ -93,6 +93,7 @@ def home(request):
             feed__subscribers__is_active=True,
         )
         .select_related("feed")
+        .prefetch_related("user_interactions")
         .order_by("-published_at")
     )
 

@@ -3,6 +3,7 @@ from django.utils import timezone
 import logging
 from news_aggregator.feed_service.models import Feed, FeedEntry
 from news_aggregator.feed_service.services import FeedService
+from news_aggregator.feed_service.services import AIService
 
 logger = logging.getLogger(__name__)
 
@@ -65,6 +66,13 @@ class Command(BaseCommand):
                         if success:
                             result["articles_loaded"] += 1
                             total_articles_loaded += 1
+
+                            # Add AI processing here
+                            self.stdout.write(
+                                f"Processing article with AI: {entry.title}"
+                            )
+                            AIService.process_entry_for_all_users(entry)
+
                         else:
                             result["article_errors"] += 1
                             total_article_errors += 1
