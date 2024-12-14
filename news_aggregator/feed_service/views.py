@@ -28,13 +28,16 @@ def add_feed(request):
 
     if request.method == "POST":
         action = request.POST.get("action")
+        is_rss = request.POST.get("is_rss") == "on"
 
         if action == "subscribe" and request.POST.get("url"):
-            return handle_feed_subscription(request, request.POST["url"])
+            return handle_feed_subscription(request, request.POST["url"], is_rss)
 
         if form.is_valid():
             try:
-                preview_data = FeedService.preview_feed(form.cleaned_data["url"])
+                preview_data = FeedService.preview_feed(
+                    form.cleaned_data["url"], is_rss=is_rss
+                )
                 context["preview_data"] = preview_data
             except (URLError, HTTPError) as e:
                 if request.headers.get("X-Requested-With") == "XMLHttpRequest":
@@ -52,10 +55,10 @@ def add_feed(request):
     return render(request, "feed_service/add_feed.html", context)
 
 
-def handle_feed_subscription(request, url):
+def handle_feed_subscription(request, url, is_rss=True):
     """Handle the actual feed subscription after preview."""
     try:
-        preview_data = FeedService.preview_feed(url)
+        preview_data = FeedService.preview_feed(url, is_rss=is_rss)
 
         if preview_data.is_already_in_db:
             feed = Feed.objects.get(url=url)
@@ -65,7 +68,7 @@ def handle_feed_subscription(request, url):
                 messages.error(request, "You are already subscribed to this feed")
                 return redirect("feed_service:add_feed")
         else:
-            feed = FeedService.create_feed_from_url(url)
+            feed = FeedService.create_feed_from_url(url, is_rss=is_rss)
 
         UserFeedSubscription.objects.create(user=request.user, feed=feed)
         messages.success(request, "Successfully subscribed to feed")

@@ -17,9 +17,12 @@ Features:
     ✔ Let the user add non-RSS sites by entering a URL @done(24-12-12 20:23)
     ☐ Speed up the feed parsing process by reusing the preview data
   The system can update all feeds, creating new news entries:
-    ☐ Enable triggering an update of all feeds via terminal
+    ✔ Enable triggering an update of all feeds via terminal @done(24-12-14 13:18)
     ☐ Dashboard displays all news by day
   The system can summarize and translate news entries:
+    ☐ Add a way to let the user configure their preferences via a custom prompt
     ☐ Translate and summarize all new news entries during an update
     ☐ Display the summarized news entries in the dashboard
     ☐ Predict relevancy score for each news entry based on user preferences
+  Bugs/Issues:
+    ✔ The check-box in add feed is not remembering the selection after clicking preview @done(24-12-14 13:17)

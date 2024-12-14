@@ -33,7 +33,15 @@ class FeedEntry(models.Model):
     feed = models.ForeignKey(Feed, on_delete=models.CASCADE, related_name="entries")
     title = models.CharField(max_length=200)
     url = models.URLField()
-    content = models.TextField()
+    full_content = models.TextField(
+        help_text="Full content of the article. Initially contains feed summary, later updated with full article text"
+    )
+    article_load_error = models.TextField(
+        blank=True, default="", help_text="Error message if article loading failed"
+    )
+    article_loaded_at = models.DateTimeField(
+        null=True, blank=True, help_text="When the full article was loaded"
+    )
     author = models.CharField(max_length=100, blank=True)
     published_at = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)

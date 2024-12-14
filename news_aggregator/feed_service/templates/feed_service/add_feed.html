@@ -18,12 +18,21 @@
                    name="url"
                    value="{{ form.url.value|default:'' }}"
                    placeholder="https://example.com/feed.xml" />
-            <div class="form-text">Enter the direct URL of the RSS feed (must start with http:// or https://)</div>
+            <div class="form-text">Enter the direct URL of the website or feed (must start with http:// or https://)</div>
             {% if form.url.errors %}
               <div class="invalid-feedback">
                 {% for error in form.url.errors %}{{ error }}{% endfor %}
               </div>
             {% endif %}
+          </div>
+          <div class="mb-3 form-check">
+            <input type="checkbox"
+                   class="form-check-input"
+                   id="is_rss"
+                   name="is_rss"
+                   {% if request.POST.is_rss %}checked{% endif %} />
+            <label class="form-check-label" for="is_rss">This is an RSS feed</label>
+            <div class="form-text">Uncheck if this is a regular website that should be parsed for news content</div>
           </div>
           <div id="error-container"
                class="mb-3 text-start {% if not error %}d-none{% endif %}">
@@ -52,6 +61,8 @@
               <div class="small text-muted">
                 <strong>Feed URL:</strong> {{ preview_data.url }}
                 <br />
+                <strong>Feed Type:</strong> {{ preview_data.feed_type }}
+                <br />
                 <strong>Total Entries:</strong> {{ preview_data.entry_count }}
                 {% if preview_data.is_already_in_db %}<div class="badge bg-info">Already in database</div>{% endif %}
               </div>
@@ -77,6 +88,9 @@
                 {% csrf_token %}
                 <input type="hidden" name="url" value="{{ preview_data.url }}" />
                 <input type="hidden" name="action" value="subscribe" />
+                <input type="hidden"
+                       name="is_rss"
+                       value="{% if request.POST.is_rss %}on{% else %}off{% endif %}" />
                 <button type="submit" class="btn btn-success">
                   {% if preview_data.is_already_in_db %}
                     Subscribe to This Feed

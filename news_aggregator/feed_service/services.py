@@ -5,12 +5,23 @@ from urllib.parse import urlparse
 import feedparser
 from django.utils import timezone
 from feedparser import FeedParserDict
+from newspaper import Article
 from parsera import Parsera
 
 from .models import Feed
 from .models import FeedEntry
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class FeedParseResult:
+    """Result of parsing a feed, whether RSS or website"""
+
+    title: str
+    description: str
+    entries: list[dict]
+    is_website: bool
 
 
 @dataclass
@@ -24,52 +35,61 @@ class FeedPreview:
     latest_entries: list[dict]
     is_already_in_db: bool = False
     feed_id: int | None = None
-
-
-@dataclass
-class FeedParseResult:
-    """Result of parsing a feed, whether RSS or website"""
-
-    title: str
-    description: str
-    entries: list[dict]
-    is_website: bool
+    feed_type: str = "RSS Feed"  # Default to RSS Feed
 
 
 class FeedService:
     @staticmethod
-    def validate_feed_data(parsed: FeedParserDict | dict) -> None:
+    def parse_rss_feed(url: str) -> FeedParseResult:
         """
-        Validate parsed feed or website data.
-        Raises ValueError with a descriptive message if the data is invalid.
+        Parse a URL as an RSS feed using feedparser.
+        Returns a FeedParseResult with normalized feed data.
+        Raises ValueError if parsing fails or feed is invalid.
         """
-        if not isinstance(parsed, (dict, FeedParserDict)) or not parsed.get("feed"):
-            raise ValueError("Failed to parse content structure")
+        parsed = feedparser.parse(url)
+        if parsed.bozo and not parsed.entries:
+            raise ValueError(
+                "Invalid RSS feed format. If this is a regular website, try unchecking 'This is an RSS feed'"
+            )
 
-        entries = (
-            parsed.get("entries", []) if isinstance(parsed, dict) else parsed.entries
-        )
+        feed_data = parsed.feed
+        if not feed_data:
+            raise ValueError("No feed data found")
+
+        entries = []
+        for entry in parsed.entries:
+            if not entry.get("title") or not entry.get("link"):
+                continue
+
+            entries.append(
+                {
+                    "title": entry.get("title", ""),
+                    "link": entry.get("link", ""),
+                    "description": entry.get("description", ""),
+                    "author": entry.get("author", ""),
+                    "published_parsed": entry.get("published_parsed")
+                    or entry.get("updated_parsed"),
+                }
+            )
 
         if not entries:
-            raise ValueError("No content entries found")
-
-        required_entry_fields = ["title", "link"]
-        first_entry = entries[0]
-        missing_fields = [
-            field for field in required_entry_fields if not first_entry.get(field)
-        ]
-        if missing_fields:
-            missing_fields_str = ", ".join(missing_fields)
             raise ValueError(
-                f"Content entries are missing required fields: {missing_fields_str}"
+                "No valid entries found in the RSS feed. If this is a regular website, try unchecking 'This is an RSS feed'"
             )
+
+        return FeedParseResult(
+            title=feed_data.get("title") or urlparse(url).netloc,
+            description=feed_data.get("description", ""),
+            entries=entries,
+            is_website=False,
+        )
 
     @staticmethod
     def parse_website(url: str) -> FeedParseResult:
         """
         Parse a regular website using Parsera.
         Returns a FeedParseResult with normalized feed data.
-        Raises ValueError if the parsed data is invalid.
+        Raises ValueError if parsing fails or no valid content is found.
         """
         elements = {
             "site_title": "Main website title or brand name from the header/banner area",
@@ -91,7 +111,9 @@ class FeedService:
             logger.debug("Parsera raw output for %s: %s", url, parsed_data)
 
             if not isinstance(parsed_data, dict):
-                raise ValueError("Parsera returned invalid data structure")
+                raise ValueError(
+                    "Failed to parse website content. If this is an RSS feed, try checking 'This is an RSS feed'"
+                )
 
             domain = urlparse(url).netloc
             site_title = (parsed_data.get("site_title") or "").strip() or domain
@@ -125,7 +147,9 @@ class FeedService:
                 )
 
             if not entries:
-                raise ValueError("No valid entries found in parsed website content")
+                raise ValueError(
+                    "No news entries found on this website. If this is an RSS feed, try checking 'This is an RSS feed'"
+                )
 
             return FeedParseResult(
                 title=site_title,
@@ -136,42 +160,44 @@ class FeedService:
 
         except Exception as e:
             logger.error("Failed to parse website %s: %s", url, str(e))
-            raise ValueError(f"Failed to parse website content: {e!s}")
+            raise ValueError(str(e))
 
     @staticmethod
-    def parse_feed(url: str) -> FeedParseResult:
+    def parse_feed(url: str, is_rss: bool = True) -> FeedParseResult:
         """
-        Parse a URL as either an RSS feed or website.
-        Returns a FeedParseResult with normalized feed data.
-        Raises ValueError if parsing fails.
+        Parse a URL as either an RSS feed or website based on is_rss parameter.
+        This is the main entry point for feed parsing.
         """
-        parsed = feedparser.parse(url)
+        if is_rss:
+            return FeedService.parse_rss_feed(url)
+        return FeedService.parse_website(url)
 
-        if parsed.bozo and not parsed.entries:
-            # Not a valid RSS feed, try parsing as website
-            return FeedService.parse_website(url)
+    @staticmethod
+    def validate_feed_data(parsed: FeedParserDict | dict) -> None:
+        """
+        Validate parsed feed or website data.
+        Raises ValueError with a descriptive message if the data is invalid.
+        """
+        if not isinstance(parsed, (dict, FeedParserDict)) or not parsed.get("feed"):
+            raise ValueError("Failed to parse content structure")
 
-        feed_data = parsed.feed
-        entries = []
-
-        for entry in parsed.entries:
-            entries.append(
-                {
-                    "title": entry.get("title", ""),
-                    "link": entry.get("link", ""),
-                    "description": entry.get("description", ""),
-                    "author": entry.get("author", ""),
-                    "published_parsed": entry.get("published_parsed")
-                    or entry.get("updated_parsed"),
-                }
-            )
-
-        return FeedParseResult(
-            title=feed_data.get("title") or urlparse(url).netloc,
-            description=feed_data.get("description", ""),
-            entries=entries,
-            is_website=False,
+        entries = (
+            parsed.get("entries", []) if isinstance(parsed, dict) else parsed.entries
         )
+
+        if not entries:
+            raise ValueError("No content entries found")
+
+        required_entry_fields = ["title", "link"]
+        first_entry = entries[0]
+        missing_fields = [
+            field for field in required_entry_fields if not first_entry.get(field)
+        ]
+        if missing_fields:
+            missing_fields_str = ", ".join(missing_fields)
+            raise ValueError(
+                f"Content entries are missing required fields: {missing_fields_str}"
+            )
 
     @staticmethod
     def create_feed_entry(feed: Feed, entry_data: dict) -> FeedEntry:
@@ -199,19 +225,19 @@ class FeedService:
             feed=feed,
             title=entry_data.get("title", ""),
             url=entry_data.get("link", ""),
-            content=entry_data.get("description", ""),
+            full_content=entry_data.get("description", ""),
             author=entry_data.get("author") or "",
             published_at=published_at,
         )
 
     @staticmethod
-    def preview_feed(feed_url: str) -> FeedPreview:
+    def preview_feed(feed_url: str, is_rss: bool = True) -> FeedPreview:
         """
         Fetch feed information without saving to database.
-        Works with both RSS feeds and regular websites.
+        Works with both RSS feeds and regular websites based on is_rss parameter.
         """
         try:
-            parsed = FeedService.parse_feed(feed_url)
+            parsed = FeedService.parse_feed(feed_url, is_rss=is_rss)
             FeedService.validate_feed_data(
                 {"feed": {"title": parsed.title}, "entries": parsed.entries}
             )
@@ -240,17 +266,19 @@ class FeedService:
             latest_entries=latest_entries,
             is_already_in_db=existing_feed is not None,
             feed_id=existing_feed.pk if existing_feed else None,
+            feed_type="RSS Feed" if is_rss else "Website",
         )
 
     @staticmethod
-    def create_feed_from_url(feed_url: str) -> Feed:
+    def create_feed_from_url(feed_url: str, is_rss: bool = True) -> Feed:
         """
         Create a new feed and its initial entries from a feed URL.
+        The is_rss parameter determines whether to parse as RSS or website.
         Returns the created Feed object.
-        Raises ValueError if the URL is not a valid feed.
+        Raises ValueError if parsing fails.
         """
         try:
-            parsed = FeedService.parse_feed(feed_url)
+            parsed = FeedService.parse_feed(feed_url, is_rss=is_rss)
             FeedService.validate_feed_data(
                 {"feed": {"title": parsed.title}, "entries": parsed.entries}
             )
@@ -262,6 +290,7 @@ class FeedService:
             url=feed_url,
             description=parsed.description,
             last_updated=timezone.now(),
+            feed_type=Feed.FEED_TYPE_RSS if is_rss else Feed.FEED_TYPE_WEBSITE,
         )
 
         # Add up to 10 most recent entries
@@ -280,7 +309,9 @@ class FeedService:
         new_entries_count = 0
 
         try:
-            parsed = FeedService.parse_feed(feed.url)
+            # Use the feed's stored type to determine parsing method
+            is_rss = feed.feed_type == Feed.FEED_TYPE_RSS
+            parsed = FeedService.parse_feed(feed.url, is_rss=is_rss)
             FeedService.validate_feed_data(
                 {"feed": {"title": parsed.title}, "entries": parsed.entries}
             )
@@ -303,3 +334,32 @@ class FeedService:
             errors.append(f"Error updating feed: {str(e)}")
 
         return new_entries_count, errors
+
+    @staticmethod
+    def load_article_content(entry: FeedEntry) -> tuple[bool, str]:
+        """
+        Load the full article content for a feed entry using newspaper3k.
+        Returns a tuple of (success, error_message).
+        """
+        if entry.article_loaded_at:
+            return True, ""
+
+        try:
+            article = Article(entry.url)
+            article.download()
+            article.parse()
+
+            if not article.text:
+                return False, "No article text could be extracted"
+
+            entry.full_content = article.text
+            entry.article_loaded_at = timezone.now()
+            entry.article_load_error = ""  # Clear the error message on success
+            entry.save()
+            return True, ""
+
+        except Exception as e:
+            error_msg = f"Failed to load article: {str(e)}"
+            entry.article_load_error = error_msg
+            entry.save()
+            return False, error_msg
