@@ -4,6 +4,9 @@ from .base import INSTALLED_APPS
 from .base import MIDDLEWARE
 from .base import env
 
+# Force reading of .env file in local development
+env.read_env(str(BASE_DIR / ".env"))  # noqa: F405
+
 # GENERAL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#debug
