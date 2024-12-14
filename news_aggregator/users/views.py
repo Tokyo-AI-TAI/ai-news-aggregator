@@ -36,6 +36,22 @@ class UserUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
 user_update_view = UserUpdateView.as_view()
 
 
+class UserPreferencesView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+    model = User
+    fields = ["interests"]
+    template_name = "users/preferences.html"
+    success_message = _("Reading preferences updated successfully")
+
+    def get_success_url(self) -> str:
+        return reverse("users:preferences")
+
+    def get_object(self, queryset: QuerySet | None = None) -> User:
+        return self.request.user
+
+
+user_preferences_view = UserPreferencesView.as_view()
+
+
 class UserRedirectView(LoginRequiredMixin, RedirectView):
     permanent = False
 
