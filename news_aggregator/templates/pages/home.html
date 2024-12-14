@@ -9,9 +9,11 @@
           <a href="{{ entry.url }}"
              target="_blank"
              class="list-group-item list-group-item-action">
-            <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1">{{ entry.title }}</h5>
-              <div>
+            <div class="d-flex w-100">
+              <div class="me-3 flex-grow-1 text-truncate">
+                <h5 class="mb-1 text-truncate">{{ entry.title }}</h5>
+              </div>
+              <div class="flex-shrink-0 ms-2 text-end">
                 {% if entry.user_interactions.first.relevance_score %}
                   <span class="badge bg-primary">{{ entry.user_interactions.first.relevance_score }}% Relevant</span>
                 {% endif %}
