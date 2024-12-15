@@ -21,8 +21,8 @@ Features:
     ✔ Dashboard displays all news by day @done(24-12-14 17:12)
   The system can summarize and translate news entries:
     ✔ Add a way to let the user configure their preferences via a custom prompt @done(24-12-14 17:12)
-    ☐ Translate and summarize all new news entries during an update
-    ☐ Display the summarized news entries in the dashboard
-    ☐ Predict relevancy score for each news entry based on user preferences
+    ✔ Translate and summarize all new news entries during an update @done(24-12-15 09:56)
+    ✔ Display the summarized news entries in the dashboard @done(24-12-15 09:56)
+    ✔ Predict relevancy score for each news entry based on user preferences @done(24-12-15 09:56)
   Bugs/Issues:
     ✔ The check-box in add feed is not remembering the selection after clicking preview @done(24-12-14 13:17)
