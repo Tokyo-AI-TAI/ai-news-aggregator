@@ -24,5 +24,10 @@ Features:
     ✔ Translate and summarize all new news entries during an update @done(24-12-15 09:56)
     ✔ Display the summarized news entries in the dashboard @done(24-12-15 09:56)
     ✔ Predict relevancy score for each news entry based on user preferences @done(24-12-15 09:56)
+  Deployment:
+    ☐ Deploy to Railway
+    ☐ Enable cron job to update feeds every morning JST
+    ☐ Create a dashboard for the update job results
+    ☐ Enable on-demand update trigger
   Bugs/Issues:
     ✔ The check-box in add feed is not remembering the selection after clicking preview @done(24-12-14 13:17)
