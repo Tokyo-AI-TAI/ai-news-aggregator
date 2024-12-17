@@ -30,6 +30,9 @@ COPY . .
 # Install the project
 RUN uv sync --frozen --no-editable --no-dev
 
+# Collect static files
+RUN uv run python manage.py collectstatic --noinput
+
 # Create and switch to non-root user
 RUN adduser --disabled-password --gecos '' django_user && \
     chown -R django_user:django_user /app
