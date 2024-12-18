@@ -52,6 +52,5 @@ USER django_user
 # Expose the port
 EXPOSE 8000
 
-# Start the server
-CMD ["uv", "run", "gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--log-level", "debug", "--error-logfile", "-", "--access-logfile", "-"]
-
+# Set the entrypoint
+ENTRYPOINT ["/app/entrypoint.sh"]
