@@ -38,6 +38,9 @@ COPY . .
 # Install the project
 RUN uv sync --frozen --no-editable --no-dev
 
+# Run migrations
+RUN uv run python manage.py migrate --noinput
+
 # Collect static files
 RUN uv run python manage.py collectstatic --noinput
 
@@ -49,5 +52,11 @@ USER django_user
 # Expose the port
 EXPOSE 8000
 
-# Run migrations and start the server
-CMD ["uv", "run", "gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "config.wsgi:application"]
+# Start the server
+CMD ["uv", "run", "gunicorn", "config.wsgi:application", 
+     "--bind", "0.0.0.0:8000",
+     "--workers", "3",
+     "--log-level", "debug", 
+     "--error-logfile", "-", 
+     "--access-logfile", "-"]
+
