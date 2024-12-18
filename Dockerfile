@@ -53,10 +53,5 @@ USER django_user
 EXPOSE 8000
 
 # Start the server
-CMD ["uv", "run", "gunicorn", "config.wsgi:application", 
-     "--bind", "0.0.0.0:8000",
-     "--workers", "3",
-     "--log-level", "debug", 
-     "--error-logfile", "-", 
-     "--access-logfile", "-"]
+CMD ["uv", "run", "gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--log-level", "debug", "--error-logfile", "-", "--access-logfile", "-"]
 
