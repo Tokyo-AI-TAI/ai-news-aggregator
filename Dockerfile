@@ -38,9 +38,6 @@ COPY . .
 # Install the project
 RUN uv sync --frozen --no-editable --no-dev
 
-# Run migrations
-RUN uv run python manage.py migrate --noinput
-
 # Collect static files
 RUN uv run python manage.py collectstatic --noinput
 
