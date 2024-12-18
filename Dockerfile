@@ -49,5 +49,7 @@ USER django_user
 # Expose the port
 EXPOSE 8000
 
+RUN chmod +x /app/entrypoint.sh
+
 # Set the entrypoint
 ENTRYPOINT ["/app/entrypoint.sh"]
