@@ -38,12 +38,3 @@ application = get_wsgi_application()
 # Apply WSGI middleware here.
 # from helloworld.wsgi import HelloWorldApplication
 # application = HelloWorldApplication(application)
-
-import logging
-
-logger = logging.getLogger(__name__)
-
-# Add before application = get_wsgi_application()
-logger.info("Initializing WSGI application")
-logger.info(f"DJANGO_SETTINGS_MODULE: {os.environ.get('DJANGO_SETTINGS_MODULE')}")
-logger.info(f"ALLOWED_HOSTS from env: {os.environ.get('DJANGO_ALLOWED_HOSTS')}")
