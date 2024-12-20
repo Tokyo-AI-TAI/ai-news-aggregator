@@ -38,6 +38,7 @@ RUN uv sync --frozen --no-editable --no-dev
 
 # Install playwright
 RUN uv run playwright install
+RUN uv run playwright install-deps
 
 # Create and switch to non-root user
 RUN adduser --disabled-password --gecos '' django_user && \
