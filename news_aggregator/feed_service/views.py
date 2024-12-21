@@ -24,7 +24,12 @@ def add_feed(request):
     POST: Preview feed or subscribe to it
     """
     form = AddFeedForm(request.POST or None)
-    context = {"form": form, "preview_data": None, "error": None}
+    context = {
+        "form": form,
+        "preview_data": None,
+        "error": None,
+        "is_rss": request.POST.get("is_rss") == "on",
+    }
 
     if request.method == "POST":
         action = request.POST.get("action")
