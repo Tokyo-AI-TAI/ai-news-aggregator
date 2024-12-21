@@ -37,13 +37,14 @@ COPY . .
 RUN uv sync --frozen --no-editable --no-dev
 
 # Install playwright
-RUN uv run playwright install
-RUN uv run playwright install-deps
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libnss3 \
+    libxss1 \
+    libasound2 \
+    fonts-noto-color-emoji \
+    libxtst6
 
-# Create and switch to non-root user
-RUN adduser --disabled-password --gecos '' django_user && \
-    chown -R django_user:django_user /app
-USER django_user
+RUN uv run playwright install --with-deps
 
 RUN chmod +x ./entrypoint.sh
 
