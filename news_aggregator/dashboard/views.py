@@ -21,9 +21,7 @@ def feed_list(request):
 
     # Get feeds that either have no subscription or only inactive subscriptions
     available_feeds = (
-        Feed.objects.exclude(
-            subscribers__user=request.user, subscribers__is_active=True
-        )
+        Feed.objects.filter(is_active=True)
         .exclude(id__in=subscribed_feeds.values("id"))
         .distinct()
     )
