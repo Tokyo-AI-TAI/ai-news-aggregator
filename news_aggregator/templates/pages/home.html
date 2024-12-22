@@ -15,7 +15,9 @@
               </div>
               <div class="flex-shrink-0 ms-2 text-end">
                 {% if entry.user_interactions.first.relevance_score %}
-                  <span class="badge bg-primary">{{ entry.user_interactions.first.relevance_score }}% Relevant</span>
+                  <span class="badge {% if entry.user_interactions.first.relevance_score >= 70 %}bg-success{% elif entry.user_interactions.first.relevance_score >= 40 %}bg-warning{% else %}bg-danger{% endif %}">
+                    {{ entry.user_interactions.first.relevance_score }}% Relevant
+                  </span>
                 {% endif %}
                 <small class="text-muted ms-2">{{ entry.published_at|timesince }} ago</small>
               </div>
@@ -32,7 +34,8 @@
     {% else %}
       <div class="alert alert-info">
         <p class="mb-0">
-          No news entries yet. Try subscribing to some feeds in the <a href="{% url 'dashboard:feed_list' %}">Feeds</a> section.
+          No news entries yet. Try subscribing to some feeds in the <a href="{% url 'dashboard:feed_list' %}">Feeds</a>
+          section.
         </p>
       </div>
     {% endif %}
