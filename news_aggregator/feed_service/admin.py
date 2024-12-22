@@ -247,8 +247,10 @@ class UserArticleInteractionAdmin(admin.ModelAdmin):
 
     @admin.display(description="User")
     def user_link(self, obj):
+        if not obj.user:
+            return "No user"
         url = reverse("admin:users_user_change", args=[obj.user.id])
-        return format_html('<a href="{}">{}</a>', url, obj.user.username)
+        return format_html('<a href="{}">{}</a>', url, obj.user.email)
 
     @admin.display(description="Article")
     def entry_link(self, obj):
@@ -257,15 +259,14 @@ class UserArticleInteractionAdmin(admin.ModelAdmin):
 
     @admin.display(description="Relevance")
     def relevance_badge(self, obj):
-        color = (
-            "green"
-            if obj.relevance_score >= 70
-            else "orange"
-            if obj.relevance_score >= 40
-            else "red"
-        )
+        if obj.relevance_score >= 80:
+            color = "green"
+        elif obj.relevance_score >= 50:
+            color = "orange"
+        else:
+            color = "red"
         return format_html(
-            '<span style="color: {};">{}</span>', color, f"{obj.relevance_score}%"
+            '<span style="color: {}">{}</span>', color, obj.relevance_score
         )
 
 
@@ -289,8 +290,10 @@ class UserFeedSubscriptionAdmin(admin.ModelAdmin):
 
     @admin.display(description="User")
     def user_link(self, obj):
+        if not obj.user:
+            return "No user"
         url = reverse("admin:users_user_change", args=[obj.user.id])
-        return format_html('<a href="{}">{}</a>', url, obj.user.username)
+        return format_html('<a href="{}">{}</a>', url, obj.user.email)
 
     @admin.display(description="Feed")
     def feed_link(self, obj):
