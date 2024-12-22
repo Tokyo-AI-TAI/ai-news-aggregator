@@ -1,4 +1,4 @@
-# news-aggregator
+# AI News Aggregator
 
 Scrape, extract, translate, summarize and send news right to your inbox.
 The initial goal is to help you stay updated with the latest AI news in Japan,
@@ -8,6 +8,12 @@ including those that are only in Japanese.
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 License: MIT
+
+## About this project
+
+This project started as an experiment by [@mariomeissner](https://github.com/mariomeissner). It is built almost in its entirety by Cursor, the AI powered code editor. Almost no code was edited manually in the process.
+
+Feel free to self-host this project if you want to use it yourself, a hosted version is not available at this moment.
 
 ## Settings
 
