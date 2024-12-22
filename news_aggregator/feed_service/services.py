@@ -114,7 +114,7 @@ class FeedService:
         try:
             scraper = Parsera()
             parsed_data = scraper.run(url=url, elements=elements)
-            logger.debug("Parsera raw output for %s: %s", url, parsed_data)
+            # logger.debug("Parsera raw output for %s: %s", url, parsed_data)
 
             if not isinstance(parsed_data, dict):
                 raise ValueError(
