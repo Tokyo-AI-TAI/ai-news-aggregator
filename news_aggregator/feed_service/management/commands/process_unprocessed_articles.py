@@ -31,10 +31,16 @@ class Command(BaseCommand):
             default=100,
             help="Number of articles to process in each batch (default: 100)",
         )
+        parser.add_argument(
+            "--reprocess",
+            action="store_true",
+            help="Reprocess articles even if they were previously processed",
+        )
 
     def handle(self, *args, **options):
         hours = options["hours"]
         batch_size = options["batch_size"]
+        reprocess = options["reprocess"]
         cutoff_time = timezone.now() - timedelta(hours=hours)
 
         # Initialize feed-level tracking
@@ -80,15 +86,16 @@ class Command(BaseCommand):
                     }
                 )
 
-            # Get subscribers who haven't processed this article
-            subscribers = (
-                UserFeedSubscription.objects.filter(
-                    feed=entry.feed,
-                    is_active=True,
-                )
-                .exclude(user__article_interactions__entry=entry)
-                .select_related("user")
+            # Modified subscribers query to handle reprocessing
+            subscribers_query = UserFeedSubscription.objects.filter(
+                feed=entry.feed,
+                is_active=True,
             )
+            if not reprocess:
+                subscribers_query = subscribers_query.exclude(
+                    user__article_interactions__entry=entry
+                )
+            subscribers = subscribers_query.select_related("user")
 
             if not subscribers.exists():
                 feed_results[current_feed.id]["articles_skipped"] += 1
@@ -109,11 +116,14 @@ class Command(BaseCommand):
                         result["status"] = "error"
                         continue
 
-                    UserArticleInteraction.objects.create(
+                    # Update or create the interaction
+                    UserArticleInteraction.objects.update_or_create(
                         user=subscription.user,
                         entry=entry,
-                        custom_summary=ai_result.summary,
-                        relevance_score=ai_result.relevance_score,
+                        defaults={
+                            "custom_summary": ai_result.summary,
+                            "relevance_score": ai_result.relevance_score,
+                        },
                     )
                     result["articles_processed"] += 1
 
