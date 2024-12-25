@@ -376,6 +376,7 @@ class ArticleAnalysis(BaseModel):
 
     summary: str
     relevance_score: int
+    translated_title: str
     error: Optional[str] = None
 
 
@@ -386,11 +387,11 @@ class AIService:
     def process_article_for_user(
         self, entry: FeedEntry, user: "User"
     ) -> ArticleAnalysis:
-        """Summarize (and possibly translate) an article for a specific user, generating a custom summary and relevance score."""
+        """Summarize and translate an article for a specific user, generating a custom summary, relevance score and translated title."""
         try:
             # Create system message with clear instructions
-            system_message = """You are a precise article summarizer that processes content
-            and provides summaries focused on user interests."""
+            system_message = """You are a precise article summarizer and translator that processes content
+            and provides summaries focused on user interests. You also create impactful, meaningful and relevant titles in English."""
 
             # Create user message with article content
             user_message = f"""Consider the user's interests: "{user.interests}"
@@ -398,10 +399,13 @@ class AIService:
 Article Title: {entry.title}
 Article Content: {entry.full_content}
 
-Please provide a very short summary (TLDR, no more than two sentences) of this content, translate to English if needed, and focus on aspects matching user interests.
-Do not narrate about the article contents or discuss its relevancy in the summary, just directly summarize the content.
-If the content is not relevant to the user, simply provide a general summary. Adapting to the user's interests is only secondary.
-"""
+Please provide:
+1. A very short summary (TLDR, no more than two sentences) of this content
+2. A relevance score (0-100) based on user interests
+3. A concise, impactful title in English that captures the essence of the article. If the original title is already in English and good, you can keep it or improve it.
+
+Focus on aspects matching user interests in the summary. If the content is not relevant to the user, provide a general summary.
+The title should be attention-grabbing but accurate - no clickbait."""
 
             # Use the parse method with structured outputs
             completion = self.client.beta.chat.completions.parse(
@@ -421,6 +425,7 @@ If the content is not relevant to the user, simply provide a general summary. Ad
                 return ArticleAnalysis(
                     summary="",
                     relevance_score=0,
+                    translated_title=entry.title,  # Fallback to original title
                     error=f"AI refused to process: {completion.choices[0].message.refusal}",
                 )
 
@@ -429,7 +434,12 @@ If the content is not relevant to the user, simply provide a general summary. Ad
         except Exception as e:
             error_msg = f"Error processing article {entry.pk}: {str(e)}"
             logger.error(error_msg)
-            return ArticleAnalysis(summary="", relevance_score=0, error=error_msg)
+            return ArticleAnalysis(
+                summary="",
+                relevance_score=0,
+                translated_title=entry.title,  # Fallback to original title
+                error=error_msg,
+            )
 
     @classmethod
     def process_entry_for_all_users(cls, entry: FeedEntry) -> None:
@@ -452,6 +462,7 @@ If the content is not relevant to the user, simply provide a general summary. Ad
                     defaults={
                         "custom_summary": result.summary,
                         "relevance_score": result.relevance_score,
+                        "translated_title": result.translated_title,
                     },
                 )
             else:

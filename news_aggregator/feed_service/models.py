@@ -48,12 +48,6 @@ class FeedEntry(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     # AI-generated fields
-    title_translated = models.CharField(
-        max_length=200,
-        blank=True,
-        default="",
-        help_text="AI-translated title",
-    )
     last_processed = models.DateTimeField(
         null=True,
         blank=True,
@@ -97,6 +91,12 @@ class UserArticleInteraction(models.Model):
         blank=True,
         default="",
         help_text="AI-generated summary of the article customized for the user",
+    )
+    translated_title = models.CharField(
+        max_length=200,
+        blank=True,
+        default="",
+        help_text="AI-translated or improved title in English",
     )
     relevance_score = models.IntegerField(
         default=0,

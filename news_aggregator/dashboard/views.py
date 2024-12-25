@@ -4,10 +4,12 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.core.paginator import Paginator
+from django.db import models
 
 from news_aggregator.feed_service.models import Feed
 from news_aggregator.feed_service.models import FeedEntry
 from news_aggregator.feed_service.models import UserFeedSubscription
+from news_aggregator.feed_service.models import UserArticleInteraction
 
 
 @login_required
@@ -92,7 +94,13 @@ def home(request):
             feed__subscribers__is_active=True,
         )
         .select_related("feed")
-        .prefetch_related("user_interactions")
+        .prefetch_related(
+            models.Prefetch(
+                "user_interactions",
+                queryset=UserArticleInteraction.objects.filter(user=request.user),
+                to_attr="user_specific_interactions",
+            )
+        )
         .order_by("-published_at")
     )
 

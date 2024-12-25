@@ -65,6 +65,9 @@
   - **Pre-commit Hooks:**
     - Set up to enforce code quality standards and perform automated linting and formatting.
 
+- **AI Models:**
+  - We use `gpt-4o` for AI processing.
+
 ## Code Style & Patterns
 
 - Models use descriptive names and include helpful docstrings

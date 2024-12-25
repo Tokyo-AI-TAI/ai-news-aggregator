@@ -11,22 +11,30 @@
              class="list-group-item list-group-item-action">
             <div class="d-flex w-100">
               <div class="me-3 flex-grow-1 text-truncate">
-                <h5 class="mb-1 text-truncate">{{ entry.title }}</h5>
+                <h5 class="mb-1 text-truncate">
+                  {% with interaction=entry.user_specific_interactions.0 %}
+                    {{ interaction.translated_title|default:entry.title }}
+                  {% endwith %}
+                </h5>
               </div>
               <div class="flex-shrink-0 ms-2 text-end">
-                {% if entry.user_interactions.first.relevance_score %}
-                  <span class="badge {% if entry.user_interactions.first.relevance_score >= 70 %}bg-success{% elif entry.user_interactions.first.relevance_score >= 40 %}bg-warning{% else %}bg-danger{% endif %}">
-                    {{ entry.user_interactions.first.relevance_score }}% Relevant
-                  </span>
-                {% endif %}
+                {% with interaction=entry.user_specific_interactions.0 %}
+                  {% if interaction.relevance_score %}
+                    <span class="badge {% if interaction.relevance_score >= 70 %}bg-success{% elif interaction.relevance_score >= 40 %}bg-warning{% else %}bg-danger{% endif %}">
+                      {{ interaction.relevance_score }}% Relevant
+                    </span>
+                  {% endif %}
+                {% endwith %}
                 <small class="text-muted ms-2">{{ entry.published_at|timesince }} ago</small>
               </div>
             </div>
-            {% if entry.user_interactions.first.custom_summary %}
-              <p class="mb-1">{{ entry.user_interactions.first.custom_summary }}</p>
-            {% else %}
-              <p class="mb-1">{{ entry.full_content|truncatewords:50 }}</p>
-            {% endif %}
+            {% with interaction=entry.user_specific_interactions.0 %}
+              {% if interaction.custom_summary %}
+                <p class="mb-1">{{ interaction.custom_summary }}</p>
+              {% else %}
+                <p class="mb-1">{{ entry.full_content|truncatewords:50 }}</p>
+              {% endif %}
+            {% endwith %}
             <small class="text-muted">From: {{ entry.feed.title }}</small>
           </a>
         {% endfor %}

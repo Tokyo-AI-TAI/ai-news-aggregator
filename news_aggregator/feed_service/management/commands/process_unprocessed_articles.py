@@ -123,6 +123,7 @@ class Command(BaseCommand):
                         defaults={
                             "custom_summary": ai_result.summary,
                             "relevance_score": ai_result.relevance_score,
+                            "translated_title": ai_result.translated_title,
                         },
                     )
                     result["articles_processed"] += 1
