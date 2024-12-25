@@ -3,9 +3,9 @@
 {% block content %}
   <div class="container py-4">
     <h1 class="mb-4">Latest News</h1>
-    {% if entries %}
-      <div class="list-group">
-        {% for entry in entries %}
+    {% if page_obj %}
+      <div class="list-group mb-4">
+        {% for entry in page_obj %}
           <a href="{{ entry.url }}"
              target="_blank"
              class="list-group-item list-group-item-action">
@@ -31,6 +31,40 @@
           </a>
         {% endfor %}
       </div>
+      <!-- Pagination controls -->
+      {% if page_obj.paginator.num_pages > 1 %}
+        <nav aria-label="News navigation">
+          <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?page=1">« First</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+              </li>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+              {% if page_obj.number == num %}
+                <li class="page-item active">
+                  <span class="page-link">{{ num }}</span>
+                </li>
+              {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+              {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last »</a>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+      {% endif %}
     {% else %}
       <div class="alert alert-info">
         <p class="mb-0">

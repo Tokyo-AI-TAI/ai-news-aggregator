@@ -3,6 +3,7 @@ from django.http import HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
+from django.core.paginator import Paginator
 
 from news_aggregator.feed_service.models import Feed
 from news_aggregator.feed_service.models import FeedEntry
@@ -85,7 +86,7 @@ def unsubscribe_feed(request, feed_id):
 def home(request):
     """Display a consolidated list of news entries from all subscribed feeds."""
     # Get all entries from active subscriptions, ordered by publication date
-    entries = (
+    entry_list = (
         FeedEntry.objects.filter(
             feed__subscribers__user=request.user,
             feed__subscribers__is_active=True,
@@ -95,4 +96,9 @@ def home(request):
         .order_by("-published_at")
     )
 
-    return render(request, "pages/home.html", {"entries": entries})
+    # Add pagination with 20 items per page
+    paginator = Paginator(entry_list, 20)
+    page_number = request.GET.get("page", 1)
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, "pages/home.html", {"page_obj": page_obj})
