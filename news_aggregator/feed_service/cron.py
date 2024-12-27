@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 
 
 class UpdateFeedsCronJob(CronJobBase):
-    schedule = Schedule(run_at_times=["00:20", "07:00"])
+    schedule = Schedule(run_at_times=["00:35", "07:00"])
     code = "feed_service.update_feeds_cron"  # a unique code
     timezone = ZoneInfo("Asia/Tokyo")  # Set to JST
 

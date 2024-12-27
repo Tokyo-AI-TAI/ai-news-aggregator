@@ -1,1 +1,1 @@
-*/5 * * * * cd /app && uv python manage.py runcrons > /proc/1/fd/1 2>/proc/1/fd/2
+*/5 * * * * source /app/.venv/bin/activate && python /app/manage.py runcrons > /proc/1/fd/1 2>/proc/1/fd/2
