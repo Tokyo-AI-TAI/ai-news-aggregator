@@ -85,6 +85,7 @@ THIRD_PARTY_APPS = [
     "allauth.mfa",
     "allauth.socialaccount",
     "django_celery_beat",
+    "django_cron",
 ]
 
 LOCAL_APPS = [
@@ -339,3 +340,8 @@ STATICFILES_FINDERS += ["compressor.finders.CompressorFinder"]
 
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+# Django Cron Settings
+CRON_CLASSES = [
+    "news_aggregator.feed_service.cron.UpdateFeedsCronJob",
+]

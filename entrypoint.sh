@@ -13,5 +13,8 @@ uv run python manage.py compress
 # Run check
 uv run python manage.py check --deploy
 
+# Start cron
+service cron start
+
 # Start Gunicorn
 uv run gunicorn config.wsgi --timeout 500

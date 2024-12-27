@@ -45,5 +45,13 @@ RUN uv run playwright install --with-deps
 
 RUN chmod +x ./entrypoint.sh
 
+# Install cron
+RUN apt-get update && apt-get install -y cron
+
+# Add crontab file
+COPY crontab /etc/cron.d/app-cron
+RUN chmod 0644 /etc/cron.d/app-cron
+RUN crontab /etc/cron.d/app-cron
+
 # Set the entrypoint
 CMD ["./entrypoint.sh"]

@@ -673,6 +673,18 @@ wheels = [
 ]
 
 [[package]]
+name = "django-cron"
+version = "0.6.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/eb/0e/7341616ff90aac0b2c36fe172663bbaa0fc396e1effc215813a3eea8b7e1/django-cron-0.6.0.tar.gz", hash = "sha256:dc3c0d3433a2e4e7012f77f6d8415ad90367ba068649db2674325bc36f935841", size = 14768 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f3/fc/9a0fa82f88165d44aa38623a77f7a95bc09c4013557b30620cf5d57e4d0c/django_cron-0.6.0-py3-none-any.whl", hash = "sha256:016203554748512b7f19d7363b4fde8741c6ff63fe8a15051f3031f4a0506a41", size = 19314 },
+]
+
+[[package]]
 name = "django-debug-toolbar"
 version = "4.4.6"
 source = { registry = "https://pypi.org/simple" }
@@ -1591,6 +1603,7 @@ dependencies = [
     { name = "django-celery-beat" },
     { name = "django-compressor" },
     { name = "django-crispy-forms" },
+    { name = "django-cron" },
     { name = "django-environ" },
     { name = "django-model-utils" },
     { name = "django-redis" },
@@ -1648,6 +1661,7 @@ requires-dist = [
     { name = "django-compressor", specifier = "==4.5.1" },
     { name = "django-coverage-plugin", marker = "extra == 'dev'", specifier = "==3.1.0" },
     { name = "django-crispy-forms", specifier = "==2.3" },
+    { name = "django-cron", specifier = ">=0.6.0" },
     { name = "django-debug-toolbar", marker = "extra == 'dev'", specifier = "==4.4.6" },
     { name = "django-environ", specifier = "==0.11.2" },
     { name = "django-extensions", marker = "extra == 'dev'", specifier = "==3.2.3" },
